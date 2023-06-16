@@ -3,16 +3,15 @@ package ru.arkham.webchat.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Конфигуратор бинов для системы безопасности.
@@ -37,19 +36,13 @@ public class SecurityConfigurer {
     }
 
     /**
-     * Сервис запроса авторизации.
-     * @param authenticationConfiguration конфигурация авторизации.
-     * @return сервис запроса авторизации.
+     * Настроить сервис запроса авторизации.
+     * @param builder строитель конфигурации авторизации.
      * @throws Exception при внутренней ошибке.
      */
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        // AuthenticationManagerBuilder auth
-        // .userDetailsService(userDetailsService)
-        // .passwordEncoder(passwordEncoder());
-
-        // TODO: Переделать. Задействовать UserDetailsService.
-        return authenticationConfiguration.getAuthenticationManager();
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
+        builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     /**
@@ -61,22 +54,21 @@ public class SecurityConfigurer {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
-        // TODO: Добавить регистрацию.
+        // TODO: Реализовать регистрацию.
         http.authorizeHttpRequests(registry -> registry
-                .requestMatchers("/login")
-                .permitAll()
-                .anyRequest()
-                .authenticated());
+                .requestMatchers("/login/**").permitAll()
+                .requestMatchers("/register/**").permitAll()
+                .anyRequest().authenticated());
         // TODO: Доработать контроллер безопасности для дополнительных адресов.
         http.formLogin(configurer -> configurer
-                //.usernameParameter("username")
-                //.passwordParameter("password")
-                //.failureUrl("/login?failed")
-                //.loginProcessingUrl("/login/process")
                 .loginPage("/login")
+                .loginProcessingUrl("/login") // POST на этот URL для валидации.
                 .defaultSuccessUrl("/")
                 .permitAll());
-        http.logout(LogoutConfigurer::permitAll);
+        // TODO: Как сделать выход?
+        http.logout(logout -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .permitAll());
 
         return http.build();
     }

@@ -54,6 +54,8 @@ dependencies {
     // Работа с веб-сервером Tomcat в Spring.
     // Включает в себя необходимые библиотеки для работы с Tomcat.
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    // Валидация данных при помощи Spring Validation.
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     // Написание тестов в Spring Boot.
     // Включает в себя необходимые библиотеки для написания тестов,
     // такие как JUnit и Mockito.
