@@ -3,6 +3,7 @@ package ru.arkham.webchat.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,14 +36,27 @@ public class SecurityConfigurer {
         this.userDetailsService = userDetailsService;
     }
 
+    /*
+     * TODO: Вызывает рекурсивное связывание. Найти альтернативу.
+    public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
+        builder
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
+    }*/
+
     /**
-     * Настроить сервис запроса авторизации.
-     * @param builder строитель конфигурации авторизации.
+     * Менеджер авторизации.
+     * @param http строитель настроек безопасности.
+     * @return менеджер авторизации.
      * @throws Exception при внутренней ошибке.
      */
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+
         builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+
+        return builder.build();
     }
 
     /**
@@ -61,8 +75,8 @@ public class SecurityConfigurer {
                 .anyRequest().authenticated());
         // TODO: Доработать контроллер безопасности для дополнительных адресов.
         http.formLogin(configurer -> configurer
-                .loginPage("/login")
-                .loginProcessingUrl("/login") // POST на этот URL для валидации.
+                //.loginPage("/login") // GET на этот URL для формы входа.
+                //.loginProcessingUrl("/login") // POST на этот URL для валидации.
                 .defaultSuccessUrl("/")
                 .permitAll());
         // TODO: Как сделать выход?

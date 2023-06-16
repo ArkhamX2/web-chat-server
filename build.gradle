@@ -36,6 +36,7 @@ dependencies {
     // Включает в себя необходимые библиотеки для работы с WebSocket,
     // такие как SockJS и STOMP.
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.jetbrains:annotations:24.0.0'
     // Библиотека Lombok.
     // Позволяет уменьшить количество шаблонного кода в классах,
     // таких геттеры, сеттеры и конструкторы.

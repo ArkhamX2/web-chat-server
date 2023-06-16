@@ -10,8 +10,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
      * Найти пользователя по его имени.
-     * @param username Логин.
+     * @param name имя.
      * @return Пользователь.
      */
-    User findByUsername(String username);
+    User findByName(String name);
 }
