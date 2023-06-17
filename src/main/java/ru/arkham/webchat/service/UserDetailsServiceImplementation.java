@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * Сервис работы с данными пользователей.
+ * Требуется для корректного функционирования модуля безопасности.
  */
 @Service
 public class UserDetailsServiceImplementation implements UserDetailsService {
@@ -36,13 +37,13 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
 
     /**
      * Получить данные пользователя по его имени.
-     * @param name имя пользователя.
+     * @param username имя пользователя.
      * @return данные пользователя.
      * @throws UsernameNotFoundException если пользователь не найден.
      */
     @Override
-    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        User user = userRepository.findByName(name);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByName(username);
 
         if (user == null) {
             throw new UsernameNotFoundException("Пользователь не найден!");
@@ -60,8 +61,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
      * @return разрешения.
      */
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection <Role> roles) {
-        return roles
-                .stream()
+        return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
     }

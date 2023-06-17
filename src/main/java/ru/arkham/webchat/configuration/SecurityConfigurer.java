@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
- * Конфигуратор бинов для системы безопасности.
+ * Конфигуратор бинов для модуля безопасности.
  */
 @Configuration
 @EnableWebSecurity
@@ -23,7 +23,6 @@ public class SecurityConfigurer {
 
     /**
      * Сервис загрузки данных пользователей.
-     * TODO: Понять, что с этим делать.
      */
     private final UserDetailsService userDetailsService;
 
@@ -35,14 +34,6 @@ public class SecurityConfigurer {
     public SecurityConfigurer(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
-
-    /*
-     * TODO: Вызывает рекурсивное связывание. Найти альтернативу.
-    public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
-        builder
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
-    }*/
 
     /**
      * Менеджер авторизации.
@@ -70,18 +61,17 @@ public class SecurityConfigurer {
         http.csrf(AbstractHttpConfigurer::disable);
         // TODO: Реализовать регистрацию.
         http.authorizeHttpRequests(registry -> registry
-                .requestMatchers("/login/**").permitAll()
-                .requestMatchers("/register/**").permitAll()
+                .requestMatchers("/security/register").permitAll()
                 .anyRequest().authenticated());
-        // TODO: Доработать контроллер безопасности для дополнительных адресов.
         http.formLogin(configurer -> configurer
-                //.loginPage("/login") // GET на этот URL для формы входа.
-                //.loginProcessingUrl("/login") // POST на этот URL для валидации.
+                .loginPage("/security/login") // GET на этот URL для старта входа.
+                .loginProcessingUrl("/security/login") // POST на этот URL для проверки входа.
+                .usernameParameter("username") // Параметр для передачи имени пользователя в POST.
+                .passwordParameter("password") // Параметр для передачи пароля в POST.
                 .defaultSuccessUrl("/")
                 .permitAll());
-        // TODO: Как сделать выход?
-        http.logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+        http.logout(configurer -> configurer
+                .logoutUrl("/security/logout") // POST на этот URL для выхода.
                 .permitAll());
 
         return http.build();

@@ -1,5 +1,6 @@
 package ru.arkham.webchat.controller.request;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,16 +18,18 @@ public class RegisterRequest {
     /**
      * Имя пользователя.
      */
+    @NotEmpty
     private String name;
 
     /**
      * Пароль пользователя.
      */
+    @NotEmpty
     private String password;
 
     /**
      * Флаг администратора.
      * Обозначает необходимость назначения пользователю роли идминистратора.
      */
-    private Boolean isAdministrator;
+    private Boolean administratorFlag = false;
 }
