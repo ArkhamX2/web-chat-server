@@ -1,19 +1,18 @@
 package ru.arkham.webchat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import ru.arkham.webchat.model.User;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.arkham.webchat.controller.request.LoginRequest;
+import ru.arkham.webchat.controller.request.LogoutRequest;
+import ru.arkham.webchat.controller.request.RegisterRequest;
 import ru.arkham.webchat.service.UserServiceImplementation;
 
 /**
  * Контроллер безопасности.
  */
-@Controller
+@RestController
+@RequestMapping("/security")
 public class SecurityController {
 
     /**
@@ -23,7 +22,6 @@ public class SecurityController {
 
     /**
      * Конструктор.
-     * TODO: Нужна ли здесь аннотация @Autowired?
      * @param userService сервис работы с пользователями.
      */
     @Autowired
@@ -31,57 +29,72 @@ public class SecurityController {
         this.userService = userService;
     }
 
-    /*
-     * GET запрос для авторизации пользователя.
-     * @return название вида для отображения.
-     *
-    @GetMapping("/login")
-    public String showLoginForm() {
-        // TODO: Реализовать.
-        return "login";
-    }*/
-
     /**
-     * GET запрос для регистрации пользователя.
-     * @return название вида для отображения.
+     * GET запрос авторизации пользователя.
+     * @return тело ответа.
      */
-    @GetMapping("/register")
-    public String showRegistrationForm(Model model){
-        User user = new User();
+    @GetMapping("/login")
+    public ResponseEntity<String> processLogin() {
+        // TODO: Обработка логики входа пользователя.
 
-        model.addAttribute("user", user);
-
-        // TODO: Реализовать.
-        return "register";
+        return ResponseEntity.ok("GET_LOGIN_OK");
     }
 
     /**
-     * POST запрос для верификации регистрации пользователя.
-     * @return название вида для отображения.
+     * POST запрос авторизации пользователя.
+     * @param loginRequest тело запроса.
+     * @return тело ответа.
      */
-    @PostMapping("/register/save")
-    public String processRegistration(@ModelAttribute("user") User user,
-                               BindingResult result,
-                               Model model) {
-        User existing = userService.findByName(user.getName());
+    @PostMapping("/login")
+    public ResponseEntity<String> processLogin(@RequestBody LoginRequest loginRequest) {
+        // TODO: Обработка логики входа пользователя.
 
-        if (existing != null) {
-            // TODO: Какой номер ошибки?
-            result.rejectValue(
-                    "name",
-                    "1",
-                    "Аккаунт с указанным именем уже зарегистрирован!");
-        }
+        return ResponseEntity.ok("POST_LOGIN_OK");
+    }
 
-        // Повторная регистрация при ошибке.
-        if (result.hasErrors()) {
-            model.addAttribute("user", user);
-            return "register";
-        }
+    /**
+     * GET запрос регистрации пользователя.
+     * @return тело ответа.
+     */
+    @GetMapping("/register")
+    public ResponseEntity<String> processRegistration() {
+        // TODO: Обработка логики регистрации пользователя.
 
-        userService.saveUser(user);
+        return ResponseEntity.ok("GET_REGISTER_OK");
+    }
 
-        // TODO: Куда редиректить и каким образом?
-        return "redirect:/register?success";
+    /**
+     * POST запрос регистрации пользователя.
+     * @param registerRequest тело запроса.
+     * @return тело ответа.
+     */
+    @PostMapping("/register")
+    public ResponseEntity<String> processRegistration(@RequestBody RegisterRequest registerRequest) {
+        // TODO: Обработка логики регистрации пользователя.
+
+        return ResponseEntity.ok("POST_REGISTER_OK");
+    }
+
+    /**
+     * GET запрос выхода пользователя.
+     * @return тело ответа.
+     */
+    @GetMapping("/logout")
+    public ResponseEntity<String> processLogout() {
+        // TODO: Обработка логики выхода пользователя.
+
+        return ResponseEntity.ok("GET_LOGOUT_OK");
+    }
+
+    /**
+     * POST запрос выхода пользователя.
+     * @param logoutRequest тело запроса.
+     * @return тело ответа.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<String> processLogout(@RequestBody LogoutRequest logoutRequest) {
+        // TODO: Обработка логики выхода пользователя.
+
+        return ResponseEntity.ok("POST_LOGOUT_OK");
     }
 }

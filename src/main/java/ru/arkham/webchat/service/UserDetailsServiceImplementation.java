@@ -27,7 +27,6 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
 
     /**
      * Конструктор.
-     * TODO: Нужна ли здесь аннотация @Autowired?
      * @param userRepository репозиторий пользователей.
      */
     @Autowired

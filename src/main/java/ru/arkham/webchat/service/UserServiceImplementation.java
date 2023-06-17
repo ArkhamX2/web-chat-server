@@ -34,7 +34,6 @@ public class UserServiceImplementation {
 
     /**
      * Конструктор.
-     * TODO: Нужна ли здесь аннотация @Autowired?
      * @param userRepository репозиторий пользователей.
      * @param roleRepository репозиторий пользовательских ролей.
      * @param passwordEncoder шифратор паролей.
