@@ -58,7 +58,6 @@ public class SecurityConfigurer {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
-        // TODO: Реализовать регистрацию.
         http.authorizeHttpRequests(registry -> registry
                 .requestMatchers("/security/register").permitAll()
                 .anyRequest().authenticated());
@@ -67,12 +66,12 @@ public class SecurityConfigurer {
                 .loginProcessingUrl("/security/login") // POST на этот URL для проверки входа.
                 .usernameParameter("username") // Параметр для передачи имени пользователя в POST.
                 .passwordParameter("password") // Параметр для передачи пароля в POST.
-                .failureUrl("/security/login?error")
+                .failureUrl("/security/login?error") // Дополнительный параметр при ошибке.
                 .defaultSuccessUrl("/")
                 .permitAll());
         http.logout(configurer -> configurer
                 .logoutUrl("/security/logout") // POST на этот URL для выхода.
-                .logoutSuccessUrl("/security/login?logout")
+                .logoutSuccessUrl("/security/login?logout") // Дополнительный параметр при выходе.
                 .permitAll());
 
         return http.build();

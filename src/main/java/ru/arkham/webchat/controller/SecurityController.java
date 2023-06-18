@@ -14,6 +14,8 @@ import java.util.List;
 
 /**
  * Контроллер модуля безопасности.
+ * TODO: Переделать все URL в константы.
+ * TODO: Переделать все тела ответов в константы или использовать отдельные классы.
  */
 @RestController
 @RequestMapping("/security")
@@ -39,7 +41,7 @@ public class SecurityController {
      */
     @GetMapping("/register")
     public ResponseEntity<String> processRegistration() {
-        // TODO: Обработка логики регистрации пользователя.
+        // TODO: Передавать RegisterRequest?
 
         return ResponseEntity.ok("GET_REGISTER_OK");
     }
@@ -54,14 +56,16 @@ public class SecurityController {
     public ResponseEntity<String> processRegistration(@Valid @RequestBody RegisterRequest registerRequest) {
         String name = registerRequest.getName();
 
-        if (userService.findByName(name) != null) {
+        if (userService.findUserByName(name) != null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("POST_REGISTER_USER_EXISTS");
         }
 
+        // TODO: Формирование пользователя можно вынести отдельно.
         User user = new User();
         String password = userService.encodePassword(registerRequest.getPassword());
         List<String> roles = new ArrayList<>();
 
+        // TODO: Переделать стандартные имена ролей в константы.
         roles.add("USER");
 
         if (registerRequest.getAdministratorFlag()) {

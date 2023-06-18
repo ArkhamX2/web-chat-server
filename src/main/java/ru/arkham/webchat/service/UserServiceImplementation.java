@@ -13,7 +13,6 @@ import java.util.List;
 
 /**
  * Сервис работы с пользователями.
- * TODO: Возможно, необходимо создать интерфейс для автоматического связывания.
  */
 @Service
 public class UserServiceImplementation {
@@ -61,7 +60,7 @@ public class UserServiceImplementation {
      * @param name имя.
      * @return пользователь.
      */
-    public User findByName(String name) {
+    public User findUserByName(String name) {
         return userRepository.findByName(name);
     }
 
