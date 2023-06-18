@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.arkham.webchat.controller.request.RegisterRequest;
 import ru.arkham.webchat.model.User;
-import ru.arkham.webchat.service.UserServiceImplementation;
+import ru.arkham.webchat.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +24,14 @@ public class SecurityController {
     /**
      * Сервис работы с пользователями.
      */
-    private final UserServiceImplementation userService;
+    private final UserService userService;
 
     /**
      * Конструктор.
      * @param userService сервис работы с пользователями.
      */
     @Autowired
-    public SecurityController(UserServiceImplementation userService) {
+    public SecurityController(UserService userService) {
         this.userService = userService;
     }
 

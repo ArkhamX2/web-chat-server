@@ -15,7 +15,7 @@ import java.util.List;
  * Сервис работы с пользователями.
  */
 @Service
-public class UserServiceImplementation {
+public class UserService {
 
     /**
      * Репозиторий пользователей.
@@ -39,9 +39,9 @@ public class UserServiceImplementation {
      * @param passwordEncoder шифратор паролей.
      */
     @Autowired
-    public UserServiceImplementation(UserRepository userRepository,
-                           RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;

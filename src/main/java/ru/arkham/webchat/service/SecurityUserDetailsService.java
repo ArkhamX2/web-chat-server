@@ -15,11 +15,10 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
- * Сервис работы с данными пользователей.
- * Требуется для корректного функционирования модуля безопасности.
+ * Сервис работы с данными пользователей модуля безопасности.
  */
 @Service
-public class UserDetailsServiceImplementation implements UserDetailsService {
+public class SecurityUserDetailsService implements UserDetailsService {
 
     /**
      * Репозиторий пользователей.
@@ -31,12 +30,12 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
      * @param userRepository репозиторий пользователей.
      */
     @Autowired
-    public UserDetailsServiceImplementation(UserRepository userRepository) {
+    public SecurityUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     /**
-     * Получить данные пользователя по его имени.
+     * Получить данные пользователя модуля безопасности по его имени.
      * @param username имя пользователя.
      * @return данные пользователя.
      * @throws UsernameNotFoundException если пользователь не найден.
