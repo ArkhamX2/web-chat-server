@@ -4,18 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Конфигуратор бинов для системы безопасности.
+ * Конфигуратор бинов для модуля безопасности.
  */
 @Configuration
 @EnableWebSecurity
@@ -23,7 +22,6 @@ public class SecurityConfigurer {
 
     /**
      * Сервис загрузки данных пользователей.
-     * TODO: Понять, что с этим делать.
      */
     private final UserDetailsService userDetailsService;
 
@@ -37,19 +35,18 @@ public class SecurityConfigurer {
     }
 
     /**
-     * Сервис запроса авторизации.
-     * @param authenticationConfiguration конфигурация авторизации.
-     * @return сервис запроса авторизации.
+     * Менеджер авторизации.
+     * @param http строитель настроек безопасности.
+     * @return менеджер авторизации.
      * @throws Exception при внутренней ошибке.
      */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        // AuthenticationManagerBuilder auth
-        // .userDetailsService(userDetailsService)
-        // .passwordEncoder(passwordEncoder());
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
 
-        // TODO: Переделать. Задействовать UserDetailsService.
-        return authenticationConfiguration.getAuthenticationManager();
+        builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+
+        return builder.build();
     }
 
     /**
@@ -61,22 +58,21 @@ public class SecurityConfigurer {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
-        // TODO: Добавить регистрацию.
         http.authorizeHttpRequests(registry -> registry
-                .requestMatchers("/login")
-                .permitAll()
-                .anyRequest()
-                .authenticated());
-        // TODO: Доработать контроллер безопасности для дополнительных адресов.
+                .requestMatchers("/security/register").permitAll()
+                .anyRequest().authenticated());
         http.formLogin(configurer -> configurer
-                //.usernameParameter("username")
-                //.passwordParameter("password")
-                //.failureUrl("/login?failed")
-                //.loginProcessingUrl("/login/process")
-                .loginPage("/login")
+                .loginPage("/security/login") // GET на этот URL для старта входа.
+                .loginProcessingUrl("/security/login") // POST на этот URL для проверки входа.
+                .usernameParameter("username") // Параметр для передачи имени пользователя в POST.
+                .passwordParameter("password") // Параметр для передачи пароля в POST.
+                .failureUrl("/security/login?error") // Дополнительный параметр при ошибке.
                 .defaultSuccessUrl("/")
                 .permitAll());
-        http.logout(LogoutConfigurer::permitAll);
+        http.logout(configurer -> configurer
+                .logoutUrl("/security/logout") // POST на этот URL для выхода.
+                .logoutSuccessUrl("/security/login?logout") // Дополнительный параметр при выходе.
+                .permitAll());
 
         return http.build();
     }
