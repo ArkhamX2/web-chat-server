@@ -8,6 +8,7 @@ import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.repository.RoleRepository;
 import ru.arkham.webchat.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,16 +53,6 @@ public class UserServiceImplementation {
      * @param user пользователь.
      */
     public void saveUser(User user) {
-        Role role = roleRepository.findByName("USER");
-
-        if (role == null) {
-            role = createRole("USER");
-        }
-
-        // TODO: Возможно, следует реализовать это отдельно.
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(List.of(role));
-
         userRepository.save(user);
     }
 
@@ -72,6 +63,36 @@ public class UserServiceImplementation {
      */
     public User findByName(String name) {
         return userRepository.findByName(name);
+    }
+
+    /**
+     * Получить хеш пароля.
+     * @param rawPassword пароль.
+     * @return хеш пароля.
+     */
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
+    /**
+     * Создать и получить пользовательские роли.
+     * @param roleNames названия ролей.
+     * @return пользовательские роли.
+     */
+    public List<Role> createRoles(List<String> roleNames) {
+        List<Role> roles = new ArrayList<>();
+
+        for (String roleName: roleNames) {
+            Role role = roleRepository.findByName(roleName);
+
+            if (role == null) {
+                role = createRole(roleName);
+            }
+
+            roles.add(role);
+        }
+
+        return roles;
     }
 
     /**

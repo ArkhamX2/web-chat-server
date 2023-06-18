@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Конфигуратор бинов для модуля безопасности.
@@ -68,10 +67,12 @@ public class SecurityConfigurer {
                 .loginProcessingUrl("/security/login") // POST на этот URL для проверки входа.
                 .usernameParameter("username") // Параметр для передачи имени пользователя в POST.
                 .passwordParameter("password") // Параметр для передачи пароля в POST.
+                .failureUrl("/security/login?error")
                 .defaultSuccessUrl("/")
                 .permitAll());
         http.logout(configurer -> configurer
                 .logoutUrl("/security/logout") // POST на этот URL для выхода.
+                .logoutSuccessUrl("/security/login?logout")
                 .permitAll());
 
         return http.build();
