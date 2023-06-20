@@ -1,13 +1,15 @@
 plugins {
     id 'java'
-    id 'war'
     id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group = 'ru.arkham'
-version = '0.0.4-SNAPSHOT'
-sourceCompatibility = '17'
+version = '0.1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
 
 configurations {
     compileOnly {
@@ -20,50 +22,16 @@ repositories {
 }
 
 dependencies {
-    // Работа с JPA (Java Persistence API) в Spring Boot.
-    // Включает в себя необходимые библиотеки для работы с базами данных,
-    // такие как Hibernate и JDBC.
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    // Работа с безопасностью в Spring Boot.
-    // Включает в себя необходимые библиотеки для работы с авторизацией,
-    // такие как Spring Security.
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    // Работа с веб-приложениями в Spring Boot.
-    // Включает в себя необходимые библиотеки для работы с веб-сервером,
-    // такие как Tomcat или Jetty.
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    // Работа с WebSocket в Spring Boot.
-    // Включает в себя необходимые библиотеки для работы с WebSocket,
-    // такие как SockJS и STOMP.
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.jetbrains:annotations:24.0.0'
-    // Библиотека Lombok.
-    // Позволяет уменьшить количество шаблонного кода в классах,
-    // таких геттеры, сеттеры и конструкторы.
-    // Зависимость будет использоваться во время компиляции,
-    // но не будет включена в конечный продукт при сборке.
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-    // Работа с базами данных MariaDB в Spring Boot.
-    // Включает в себя необходимые библиотеки для работы с MariaDB.
-    // Зависимость будет использоваться только во время выполнения приложения,
-    // но не будет включена в конечный продукт при сборке.
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-    // Зависимость Lombok будет использоваться во время компиляции для обработки
-    // аннотаций и генерации соответствующего кода.
-    annotationProcessor 'org.projectlombok:lombok'
-    // Работа с веб-сервером Tomcat в Spring.
-    // Включает в себя необходимые библиотеки для работы с Tomcat.
-    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-    // Валидация данных при помощи Spring Validation.
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    // Написание тестов в Spring Boot.
-    // Включает в себя необходимые библиотеки для написания тестов,
-    // такие как JUnit и Mockito.
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    // Написание тестов безопасности в Spring Boot.
-    // Включает в себя необходимые библиотеки для написания тестов безопасности,
-    // такие как Spring Security Test.
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
