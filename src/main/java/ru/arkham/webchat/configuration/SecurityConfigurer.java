@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import ru.arkham.webchat.controller.SecurityController;
 
 /**
  * Конфигуратор бинов для модуля безопасности.
@@ -60,19 +61,19 @@ public class SecurityConfigurer {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(registry -> registry
                 .requestMatchers("/").permitAll()
-                .requestMatchers("/security/register").permitAll()
+                .requestMatchers(SecurityController.URL_HOME_REGISTER).permitAll()
                 .anyRequest().authenticated());
         http.formLogin(configurer -> configurer
-                .loginPage("/security/login") // GET на этот URL для обработки входа.
-                .loginProcessingUrl("/security/login") // POST на этот URL для авторизации.
+                .loginPage(SecurityController.URL_HOME_LOGIN) // GET на этот URL для обработки входа.
+                .loginProcessingUrl(SecurityController.URL_HOME_LOGIN) // POST на этот URL для авторизации.
                 .usernameParameter("username") // Параметр для передачи имени пользователя в POST.
                 .passwordParameter("password") // Параметр для передачи пароля в POST.
-                .failureUrl("/security/login?error") // Дополнительный параметр при ошибке.
+                .failureUrl(SecurityController.URL_HOME_LOGIN + "?error") // Дополнительный параметр при ошибке.
                 .defaultSuccessUrl("/")
                 .permitAll());
         http.logout(configurer -> configurer
-                .logoutUrl("/security/logout") // POST на этот URL для выхода.
-                .logoutSuccessUrl("/security/login?logout") // Дополнительный параметр при выходе.
+                .logoutUrl(SecurityController.URL_HOME + "/logout") // POST на этот URL для выхода.
+                .logoutSuccessUrl(SecurityController.URL_HOME_LOGIN + "?logout") // Дополнительный параметр при выходе.
                 .permitAll());
 
         return http.build();

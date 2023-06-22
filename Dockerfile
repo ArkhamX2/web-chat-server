@@ -1,22 +1,39 @@
-FROM eclipse-temurin:17-jre-jammy
+# Этап сборки.
+FROM eclipse-temurin:17-jdk-jammy AS build
 
-# Копирование скомпилированных файлов проекта
-# Перед сборкой образа необходимо подготовить билд приложения
-# TODO: Сборка приложения внутри контейнера слишком ресурсозатратна. Найти способ автоматизации.
-COPY build/libs/*.jar /app/web-chat-server.jar
-
-# Переменные окружения
-ENV DATABASE_HOST="localhost"
-ENV DATABASE_PORT="3306"
-ENV DATABASE_USER="arkham"
-ENV DATABASE_PASSWORD="secret"
-
-# Переменная окружения параметров запуска Java для удаленной отладки
-ENV JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
-
-# Открытие портов 8080 и 5005
-EXPOSE 8080 5005
-
+# Переключение в директорию проекта.
 WORKDIR /app
 
+# Копирование исходного кода проекта в контейнер.
+COPY . .
+
+# Очистка директории сборки.
+RUN rm -rf ./build/libs
+
+# Сборка проекта.
+RUN ./gradlew bootjar -i --stacktrace --no-daemon
+
+# Этап запуска.
+FROM eclipse-temurin:17-jre-jammy
+
+# Рабочая дирректория.
+WORKDIR /app
+
+# Копирование билда проекта.
+COPY --from=build /app/build/libs/*.jar ./web-chat-server.jar
+
+# Переменные окружения для настройки подключения к базе данных.
+ENV DATASOURCE_DATABASE="web-chat"
+ENV DATASOURCE_HOST="localhost"
+ENV DATASOURCE_PORT="3306"
+ENV DATASOURCE_USER="arkham"
+ENV DATASOURCE_PASSWORD="secret"
+
+# Переменная окружения параметров запуска Java для удаленной отладки.
+ENV JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+
+# Открытие портов 8080 (tomcat) и 5005 (debugger).
+EXPOSE 8080 5005
+
+# Запуск. Используется встроенный сервер tomcat.
 ENTRYPOINT ["java", "-jar", "web-chat-server.jar"]
