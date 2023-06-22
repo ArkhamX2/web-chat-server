@@ -1,13 +1,26 @@
-# Деплой приложения.
+# Этап сборки.
+FROM eclipse-temurin:17-jdk-jammy AS build
+
+# Переключение в директорию проекта.
+WORKDIR /app
+
+# Копирование исходного кода проекта в контейнер.
+COPY . .
+
+# Очистка директории сборки.
+RUN rm -rf ./build/libs
+
+# Сборка проекта.
+RUN ./gradlew bootjar -i --stacktrace
+
+# Этап запуска.
 FROM eclipse-temurin:17-jre-jammy
 
 # Рабочая дирректория.
 WORKDIR /app
 
-# Копирование скомпилированных файлов проекта.
-# Перед сборкой образа необходимо подготовить билд приложения.
-# TODO: Сборка приложения внутри контейнера слишком ресурсозатратна. Найти способ автоматизации.
-COPY build/libs/*.jar ./web-chat-server.jar
+# Копирование билда проекта.
+COPY --from=build /app/build/libs/*.jar ./web-chat-server.jar
 
 # Переменные окружения для настройки подключения к базе данных.
 ENV DATABASE_HOST="localhost"
