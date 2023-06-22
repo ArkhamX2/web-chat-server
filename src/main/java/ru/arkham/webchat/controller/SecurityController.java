@@ -71,21 +71,7 @@ public class SecurityController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("POST_REGISTER_USER_EXISTS");
         }
 
-        // TODO: Формирование пользователя можно вынести отдельно.
-        User user = new User();
-        String password = userService.encodePassword(registerRequest.getPassword());
-        List<String> roles = new ArrayList<>();
-
-        // TODO: Переделать стандартные имена ролей в константы.
-        roles.add("USER");
-
-        if (registerRequest.getAdministratorFlag()) {
-            roles.add("ADMIN");
-        }
-
-        user.setName(registerRequest.getName());
-        user.setPassword(password);
-        user.setRoles(userService.createRoles(roles));
+        User user = userService.mapUser(registerRequest);
 
         userService.saveUser(user);
 

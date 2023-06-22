@@ -3,6 +3,7 @@ package ru.arkham.webchat.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.arkham.webchat.controller.request.RegisterRequest;
 import ru.arkham.webchat.model.Role;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.repository.RoleRepository;
@@ -45,6 +46,30 @@ public class UserService {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    /**
+     * Создать пользователя из тела запроса регистрации.
+     * @param registerRequest тело запроса регистрации.
+     * @return пользователь.
+     */
+    public User mapUser(RegisterRequest registerRequest) {
+        User user = new User();
+        String password = encodePassword(registerRequest.getPassword());
+        List<String> roles = new ArrayList<>();
+
+        // TODO: Переделать стандартные имена ролей в константы.
+        roles.add("USER");
+
+        if (registerRequest.getAdministratorFlag()) {
+            roles.add("ADMIN");
+        }
+
+        user.setName(registerRequest.getName());
+        user.setPassword(password);
+        user.setRoles(createRoles(roles));
+
+        return user;
     }
 
     /**
