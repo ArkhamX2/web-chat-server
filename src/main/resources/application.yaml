@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: 'jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/web-chat'
-    username: '${DATABASE_USER}'
-    password: '${DATABASE_PASSWORD}'
+    url: 'jdbc:mariadb://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DATABASE}'
+    username: '${DATASOURCE_USER}'
+    password: '${DATASOURCE_PASSWORD}'
     driver-class-name: 'org.mariadb.jdbc.Driver'
   jpa:
     show-sql: true

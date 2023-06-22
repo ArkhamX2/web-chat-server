@@ -11,7 +11,7 @@ COPY . .
 RUN rm -rf ./build/libs
 
 # Сборка проекта.
-RUN ./gradlew bootjar -i --stacktrace
+RUN ./gradlew bootjar -i --stacktrace --no-daemon
 
 # Этап запуска.
 FROM eclipse-temurin:17-jre-jammy
@@ -23,10 +23,11 @@ WORKDIR /app
 COPY --from=build /app/build/libs/*.jar ./web-chat-server.jar
 
 # Переменные окружения для настройки подключения к базе данных.
-ENV DATABASE_HOST="localhost"
-ENV DATABASE_PORT="3306"
-ENV DATABASE_USER="arkham"
-ENV DATABASE_PASSWORD="secret"
+ENV DATASOURCE_DATABASE="web-chat"
+ENV DATASOURCE_HOST="localhost"
+ENV DATASOURCE_PORT="3306"
+ENV DATASOURCE_USER="arkham"
+ENV DATASOURCE_PASSWORD="secret"
 
 # Переменная окружения параметров запуска Java для удаленной отладки.
 ENV JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
