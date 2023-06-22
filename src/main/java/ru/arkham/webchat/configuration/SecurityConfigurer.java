@@ -59,11 +59,12 @@ public class SecurityConfigurer {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(registry -> registry
+                .requestMatchers("/").permitAll()
                 .requestMatchers("/security/register").permitAll()
                 .anyRequest().authenticated());
         http.formLogin(configurer -> configurer
-                .loginPage("/security/login") // GET на этот URL для старта входа.
-                .loginProcessingUrl("/security/login") // POST на этот URL для проверки входа.
+                .loginPage("/security/login") // GET на этот URL для обработки входа.
+                .loginProcessingUrl("/security/login") // POST на этот URL для авторизации.
                 .usernameParameter("username") // Параметр для передачи имени пользователя в POST.
                 .passwordParameter("password") // Параметр для передачи пароля в POST.
                 .failureUrl("/security/login?error") // Дополнительный параметр при ошибке.

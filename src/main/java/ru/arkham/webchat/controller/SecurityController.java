@@ -47,6 +47,17 @@ public class SecurityController {
     }
 
     /**
+     * GET запрос авторизации пользователя.
+     * @return тело ответа.
+     */
+    @GetMapping("/login")
+    public ResponseEntity<String> processLogin() {
+        // TODO: Передавать LoginRequest?
+
+        return ResponseEntity.ok("GET_LOGIN_OK");
+    }
+
+    /**
      * POST запрос регистрации пользователя.
      * TODO: Обработать исключения.
      * @param registerRequest тело запроса.
