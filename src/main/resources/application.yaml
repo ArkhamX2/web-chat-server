@@ -11,3 +11,8 @@ spring:
     properties:
       hibernate:
         dialect: 'org.hibernate.dialect.MariaDBDialect'
+
+# TODO: Не для продакшена.
+logging:
+  level:
+    web: debug
