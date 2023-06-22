@@ -9,17 +9,19 @@ import ru.arkham.webchat.controller.request.RegisterRequest;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Контроллер модуля безопасности.
- * TODO: Переделать все URL в константы.
  * TODO: Переделать все тела ответов в константы или использовать отдельные классы.
  */
 @RestController
-@RequestMapping("/security")
+@RequestMapping(SecurityController.URL_HOME)
 public class SecurityController {
+
+    public static final String URL_HOME = "/security";
+    public static final String URL_LOGIN = "/login";
+    public static final String URL_REGISTER = "/register";
+    public static final String URL_HOME_LOGIN = URL_HOME + URL_LOGIN;
+    public static final String URL_HOME_REGISTER = URL_HOME + URL_REGISTER;
 
     /**
      * Сервис работы с пользователями.
@@ -39,7 +41,7 @@ public class SecurityController {
      * GET запрос регистрации пользователя.
      * @return тело ответа.
      */
-    @GetMapping("/register")
+    @GetMapping(URL_REGISTER)
     public ResponseEntity<String> processRegistration() {
         // TODO: Передавать RegisterRequest?
 
@@ -50,7 +52,7 @@ public class SecurityController {
      * GET запрос авторизации пользователя.
      * @return тело ответа.
      */
-    @GetMapping("/login")
+    @GetMapping(URL_LOGIN)
     public ResponseEntity<String> processLogin() {
         // TODO: Передавать LoginRequest?
 
@@ -63,7 +65,7 @@ public class SecurityController {
      * @param registerRequest тело запроса.
      * @return тело ответа.
      */
-    @PostMapping("/register")
+    @PostMapping(URL_REGISTER)
     public ResponseEntity<String> processRegistration(@Valid @RequestBody RegisterRequest registerRequest) {
         String name = registerRequest.getName();
 
