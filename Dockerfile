@@ -14,7 +14,8 @@ RUN rm -rf ./build/libs
 RUN ./gradlew bootjar -i --stacktrace --no-daemon
 
 # Этап запуска.
-FROM eclipse-temurin:17-jre-jammy
+# TODO: Использовать eclipse-temurin:17-jre-jammy для запуска на боевом сервере.
+FROM eclipse-temurin:17-jdk-jammy
 
 # Рабочая дирректория.
 WORKDIR /app
