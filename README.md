@@ -7,7 +7,7 @@
    <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
 </p>
 
-## About
+## Описание
 Репозиторий серверной части веб-чата Molchat.
 - [MolChat](https://github.com/ArkhamX2/web-chat)
 
@@ -21,3 +21,11 @@
 - Spring Boot DevTools
 - Lombok
 - MariaDB
+
+## Запуск
+### `./gradlew bootRun`
+
+Запустить приложение в режиме разработки.\
+Открыть [http://localhost:8080](http://localhost:8080) для просмотра в браузере.
+
+Эта команда запустит контейнер MariaDB и само приложение.
