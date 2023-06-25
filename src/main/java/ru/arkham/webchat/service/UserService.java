@@ -11,6 +11,10 @@ import ru.arkham.webchat.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import static ru.arkham.webchat.model.Role.NAME_DEFAULT;
 
 /**
  * Сервис работы с пользователями.
@@ -58,11 +62,11 @@ public class UserService {
         String password = encodePassword(registerRequest.getPassword());
         List<String> roles = new ArrayList<>();
 
-        // TODO: Переделать стандартные имена ролей в константы.
-        roles.add("USER");
+        // TODO: Изменить тело запроса для списка ролей.
+        roles.add(NAME_DEFAULT);
 
-        if (registerRequest.getAdministratorFlag()) {
-            roles.add("ADMIN");
+        if (!registerRequest.getRoleName().equals(NAME_DEFAULT)) {
+            roles.add(registerRequest.getRoleName());
         }
 
         user.setName(registerRequest.getName());
@@ -84,9 +88,10 @@ public class UserService {
      * Получить пользователя по имени.
      * @param name имя.
      * @return пользователь.
+     * @throws NoSuchElementException при отсутствии пользователя.
      */
-    public User findUserByName(String name) {
-        return userRepository.findByName(name);
+    public User findUserByName(String name) throws NoSuchElementException {
+        return userRepository.findByName(name).orElseThrow();
     }
 
     /**
@@ -107,13 +112,14 @@ public class UserService {
         List<Role> roles = new ArrayList<>();
 
         for (String roleName: roleNames) {
-            Role role = roleRepository.findByName(roleName);
+            Optional<Role> role = roleRepository.findByName(roleName);
 
-            if (role == null) {
-                role = createRole(roleName);
+            if (role.isEmpty()) {
+                roles.add(createRole(roleName));
+                continue;
             }
 
-            roles.add(role);
+            roles.add(role.get());
         }
 
         return roles;

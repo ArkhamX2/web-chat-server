@@ -12,6 +12,7 @@ import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.repository.UserRepository;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
@@ -42,11 +43,9 @@ public class SecurityUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByName(username);
-
-        if (user == null) {
-            throw new UsernameNotFoundException("Пользователь не найден!");
-        }
+        User user = userRepository
+                .findByName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден!"));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getName(),
