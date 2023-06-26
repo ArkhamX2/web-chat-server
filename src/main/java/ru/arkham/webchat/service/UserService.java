@@ -1,9 +1,8 @@
 package ru.arkham.webchat.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.arkham.webchat.controller.request.RegisterRequest;
 import ru.arkham.webchat.model.Role;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.repository.RoleRepository;
@@ -19,6 +18,7 @@ import static ru.arkham.webchat.model.Role.NAME_DEFAULT;
 /**
  * Сервис работы с пользователями.
  */
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
@@ -36,21 +36,6 @@ public class UserService {
      * Шифратор паролей.
      */
     private final PasswordEncoder passwordEncoder;
-
-    /**
-     * Конструктор.
-     * @param userRepository репозиторий пользователей.
-     * @param roleRepository репозиторий пользовательских ролей.
-     * @param passwordEncoder шифратор паролей.
-     */
-    @Autowired
-    public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     /**
      * Подготовить данные нового пользователя для сохранения.
@@ -89,6 +74,15 @@ public class UserService {
      */
     public User findUserByName(String name) throws NoSuchElementException {
         return userRepository.findByName(name).orElseThrow();
+    }
+
+    /**
+     * Проверить наличие пользователя по его имени.
+     * @param name имя.
+     * @return статус проверки.
+     */
+    public Boolean hasUserByName(String name) {
+        return userRepository.existsByName(name);
     }
 
     /**

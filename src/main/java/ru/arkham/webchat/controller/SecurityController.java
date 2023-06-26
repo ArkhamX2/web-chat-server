@@ -1,21 +1,20 @@
 package ru.arkham.webchat.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.arkham.webchat.controller.mapper.UserMapper;
+import ru.arkham.webchat.controller.request.LoginRequest;
 import ru.arkham.webchat.controller.request.RegisterRequest;
+import ru.arkham.webchat.controller.response.AuthorizationResponse;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.service.UserService;
 
-import java.util.NoSuchElementException;
-
 /**
  * Контроллер модуля безопасности.
- * TODO: Переделать все тела ответов в константы или использовать отдельные классы.
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(SecurityController.URL_HOME)
 public class SecurityController {
@@ -23,8 +22,6 @@ public class SecurityController {
     public static final String URL_HOME = "/security";
     public static final String URL_LOGIN = "/login";
     public static final String URL_REGISTER = "/register";
-    public static final String URL_HOME_LOGIN = URL_HOME + URL_LOGIN;
-    public static final String URL_HOME_REGISTER = URL_HOME + URL_REGISTER;
 
     /**
      * Сервис работы с пользователями.
@@ -32,66 +29,39 @@ public class SecurityController {
     private final UserService userService;
 
     /**
-     * Конструктор.
-     * @param userService сервис работы с пользователями.
+     * POST запрос авторизации пользователя.
+     * @param loginRequest тело запроса авторизации.
+     * @return тело ответа авторизации.
      */
-    @Autowired
-    public SecurityController(UserService userService) {
-        this.userService = userService;
-    }
-
-    /**
-     * GET запрос регистрации пользователя.
-     * @return тело ответа.
-     */
-    @GetMapping(URL_REGISTER)
-    public ResponseEntity<String> processRegistration() {
-        // TODO: Передавать RegisterRequest?
-
-        return ResponseEntity.ok("GET_REGISTER_OK");
-    }
-
-    /**
-     * GET запрос авторизации пользователя.
-     * @return тело ответа.
-     */
-    @GetMapping(URL_LOGIN)
-    public ResponseEntity<String> processLogin(
-            @RequestParam(required = false) String error,
-            @RequestParam(required = false) String logout) {
-        if (error != null) {
-            return ResponseEntity.ok("GET_LOGIN_ERROR_OK");
-        }
-
-        if (logout != null) {
-            return ResponseEntity.ok("GET_LOGIN_LOGOUT_OK");
-        }
-
-        return ResponseEntity.ok("GET_LOGIN_OK");
+    @PostMapping(URL_LOGIN)
+    public AuthorizationResponse processLogin(@Valid @RequestBody LoginRequest loginRequest) {
+        // TODO: Сгенерировать токен и авторизовать.
+        return new AuthorizationResponse("test");
     }
 
     /**
      * POST запрос регистрации пользователя.
      * TODO: Обработать исключения.
-     * @param registerRequest тело запроса.
-     * @return тело ответа.
+     * @param registerRequest тело запроса регистрации.
+     * @return тело ответа авторизации.
      */
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(URL_REGISTER)
-    public ResponseEntity<String> processRegistration(@Valid @RequestBody RegisterRequest registerRequest) {
+    public AuthorizationResponse processRegistration(@Valid @RequestBody RegisterRequest registerRequest) {
         String name = registerRequest.getName();
 
-        try {
-            userService.findUserByName(name);
-        } catch (NoSuchElementException exception) {
-            // TODO: Изменить тело запроса для списка ролей.
-            User user = UserMapper.toUser(registerRequest);
-            user = userService.prepareNewUser(user);
-
-            userService.saveUser(user);
-
-            return ResponseEntity.ok("POST_REGISTER_OK");
+        if (userService.hasUserByName(name)) {
+            // TODO: Заменить исключением.
+            return new AuthorizationResponse("test");
         }
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("POST_REGISTER_USER_EXISTS");
+        // TODO: Изменить тело запроса для списка ролей.
+        User user = UserMapper.toUser(registerRequest);
+        user = userService.prepareNewUser(user);
+
+        userService.saveUser(user);
+
+        // TODO: Сгенерировать токен и авторизовать.
+        return new AuthorizationResponse("test");
     }
 }
