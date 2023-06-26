@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -58,9 +59,8 @@ public class SecurityConfigurer {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(registry -> registry
-                .requestMatchers("/").permitAll()
+                .requestMatchers("/", "/error").permitAll()
                 .requestMatchers(SecurityController.URL_HOME_REGISTER).permitAll()
                 .anyRequest().authenticated());
         http.formLogin(configurer -> configurer
@@ -75,6 +75,8 @@ public class SecurityConfigurer {
                 .logoutUrl(SecurityController.URL_HOME + "/logout") // POST на этот URL для выхода.
                 .logoutSuccessUrl(SecurityController.URL_HOME_LOGIN + "?logout") // Дополнительный параметр при выходе.
                 .permitAll());
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.cors(Customizer.withDefaults());
 
         return http.build();
     }

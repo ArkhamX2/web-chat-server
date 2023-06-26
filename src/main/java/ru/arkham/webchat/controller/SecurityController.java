@@ -56,8 +56,16 @@ public class SecurityController {
      * @return тело ответа.
      */
     @GetMapping(URL_LOGIN)
-    public ResponseEntity<String> processLogin() {
-        // TODO: Передавать LoginRequest?
+    public ResponseEntity<String> processLogin(
+            @RequestParam(required = false) String error,
+            @RequestParam(required = false) String logout) {
+        if (error != null) {
+            return ResponseEntity.ok("GET_LOGIN_ERROR_OK");
+        }
+
+        if (logout != null) {
+            return ResponseEntity.ok("GET_LOGIN_LOGOUT_OK");
+        }
 
         return ResponseEntity.ok("GET_LOGIN_OK");
     }
