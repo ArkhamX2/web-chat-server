@@ -10,13 +10,13 @@ import ru.arkham.webchat.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static ru.arkham.webchat.model.Role.NAME_DEFAULT;
 
 /**
  * Сервис работы с пользователями.
+ * TODO: Возвращать Optional<User> везде где это необходимо.
  */
 @RequiredArgsConstructor
 @Service
@@ -70,10 +70,9 @@ public class UserService {
      * Получить пользователя по имени.
      * @param name имя.
      * @return пользователь.
-     * @throws NoSuchElementException при отсутствии пользователя.
      */
-    public User findUserByName(String name) throws NoSuchElementException {
-        return userRepository.findByName(name).orElseThrow();
+    public Optional<User> findUserByName(String name) {
+        return userRepository.findByName(name);
     }
 
     /**
@@ -82,7 +81,7 @@ public class UserService {
      * @return статус проверки.
      */
     public Boolean hasUserByName(String name) {
-        return userRepository.existsByName(name);
+        return findUserByName(name).isPresent();
     }
 
     /**
