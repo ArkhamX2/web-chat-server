@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.arkham.webchat.controller.mapper.UserMapper;
 import ru.arkham.webchat.controller.request.LoginRequest;
 import ru.arkham.webchat.controller.request.RegisterRequest;
-import ru.arkham.webchat.controller.response.AuthorizationResponse;
+import ru.arkham.webchat.controller.response.AuthResponse;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.service.UserService;
 
@@ -34,9 +34,9 @@ public class SecurityController {
      * @return тело ответа авторизации.
      */
     @PostMapping(URL_LOGIN)
-    public AuthorizationResponse processLogin(@Valid @RequestBody LoginRequest loginRequest) {
+    public AuthResponse processLogin(@Valid @RequestBody LoginRequest loginRequest) {
         // TODO: Сгенерировать токен и авторизовать.
-        return new AuthorizationResponse("test");
+        return new AuthResponse("test");
     }
 
     /**
@@ -47,12 +47,12 @@ public class SecurityController {
      */
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(URL_REGISTER)
-    public AuthorizationResponse processRegistration(@Valid @RequestBody RegisterRequest registerRequest) {
+    public AuthResponse processRegistration(@Valid @RequestBody RegisterRequest registerRequest) {
         String name = registerRequest.getName();
 
         if (userService.hasUserByName(name)) {
             // TODO: Заменить исключением.
-            return new AuthorizationResponse("test");
+            return new AuthResponse("test");
         }
 
         // TODO: Изменить тело запроса для списка ролей.
@@ -62,6 +62,6 @@ public class SecurityController {
         userService.saveUser(user);
 
         // TODO: Сгенерировать токен и авторизовать.
-        return new AuthorizationResponse("test");
+        return new AuthResponse("test");
     }
 }

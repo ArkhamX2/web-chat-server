@@ -6,7 +6,7 @@ import lombok.Data;
  * Тело ответа авторизации.
  */
 @Data
-public class AuthorizationResponse {
+public class AuthResponse {
 
     /**
      * Уникальный токен пользователя.
