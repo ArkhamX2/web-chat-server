@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.arkham.webchat.controller.mapper.UserMapper;
 import ru.arkham.webchat.controller.request.RegisterRequest;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.service.UserService;
@@ -73,7 +74,9 @@ public class SecurityController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("POST_REGISTER_USER_EXISTS");
         }
 
-        User user = userService.mapUser(registerRequest);
+        // TODO: Изменить тело запроса для списка ролей.
+        User user = UserMapper.toUser(registerRequest);
+        user = userService.prepareNewUser(user);
 
         userService.saveUser(user);
 

@@ -53,25 +53,21 @@ public class UserService {
     }
 
     /**
-     * Создать пользователя из тела запроса регистрации.
-     * @param registerRequest тело запроса регистрации.
-     * @return пользователь.
+     * Подготовить данные нового пользователя для сохранения.
+     * @param user пользователь.
+     * @return готовый пользователь.
      */
-    public User mapUser(RegisterRequest registerRequest) {
-        User user = new User();
-        String password = encodePassword(registerRequest.getPassword());
-        List<String> roles = new ArrayList<>();
+    public User prepareNewUser(User user) {
+        List<String> roleNames = new ArrayList<>();
 
-        // TODO: Изменить тело запроса для списка ролей.
-        roles.add(NAME_DEFAULT);
+        user.getRoles().forEach(x -> roleNames.add(x.getName()));
 
-        if (!registerRequest.getRoleName().equals(NAME_DEFAULT)) {
-            roles.add(registerRequest.getRoleName());
+        if (!roleNames.contains(NAME_DEFAULT)) {
+            roleNames.add(NAME_DEFAULT);
         }
 
-        user.setName(registerRequest.getName());
-        user.setPassword(password);
-        user.setRoles(createRoles(roles));
+        user.setPassword(encodePassword(user.getPassword()));
+        user.setRoles(createRoles(roleNames));
 
         return user;
     }
@@ -79,9 +75,10 @@ public class UserService {
     /**
      * Сохранить пользователя.
      * @param user пользователь.
+     * @return сохраненный пользователь.
      */
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 
     /**
