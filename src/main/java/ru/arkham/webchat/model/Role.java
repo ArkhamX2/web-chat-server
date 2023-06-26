@@ -36,6 +36,6 @@ public class Role
     /**
      * Список связанных пользователей.
      */
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
     private List<User> users = new ArrayList<>();
 }

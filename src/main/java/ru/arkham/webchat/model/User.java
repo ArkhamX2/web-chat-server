@@ -37,7 +37,7 @@ public class User {
     /**
      * Список связанных пользовательских ролей.
      */
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable
     private List<Role> roles = new ArrayList<>();
 }
