@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.arkham.webchat.model.Role;
 import ru.arkham.webchat.model.User;
+import ru.arkham.webchat.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class SecurityUserDetailsService implements UserDetailsService {
     /**
      * Сервис работы с пользователями.
      */
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     /**
      * Получить данные пользователя модуля безопасности по его имени.
@@ -33,8 +34,8 @@ public class SecurityUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService
-                .findUserByName(username)
+        User user = userRepository
+                .findByName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден!"));
 
         return new org.springframework.security.core.userdetails.User(
