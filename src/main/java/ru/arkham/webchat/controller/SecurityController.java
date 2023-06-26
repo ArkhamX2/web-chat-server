@@ -3,7 +3,11 @@ package ru.arkham.webchat.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import ru.arkham.webchat.configuration.component.TokenProvider;
 import ru.arkham.webchat.controller.mapper.UserMapper;
 import ru.arkham.webchat.controller.request.LoginRequest;
 import ru.arkham.webchat.controller.request.RegisterRequest;
@@ -29,14 +33,25 @@ public class SecurityController {
     private final UserService userService;
 
     /**
+     * Менеджер авторизации.
+     */
+    private final AuthenticationManager authenticationManager;
+
+    /**
+     * Провайдер JWS токенов.
+     */
+    private final TokenProvider tokenProvider;
+
+    /**
      * POST запрос авторизации пользователя.
      * @param loginRequest тело запроса авторизации.
      * @return тело ответа авторизации.
      */
     @PostMapping(URL_LOGIN)
     public AuthResponse processLogin(@Valid @RequestBody LoginRequest loginRequest) {
-        // TODO: Сгенерировать токен и авторизовать.
-        return new AuthResponse("test");
+        String token = authenticateAndGetToken(loginRequest.getName(), loginRequest.getPassword());
+
+        return new AuthResponse(token);
     }
 
     /**
@@ -61,7 +76,22 @@ public class SecurityController {
 
         userService.saveUser(user);
 
-        // TODO: Сгенерировать токен и авторизовать.
-        return new AuthResponse("test");
+        String token = authenticateAndGetToken(registerRequest.getName(), registerRequest.getPassword());
+
+        return new AuthResponse(token);
+    }
+
+    /**
+     * Авторизовать пользователя через его уникальное имя и пароль
+     * и получить JWT токен.
+     * @param username уникальное имя.
+     * @param password пароль.
+     * @return JWT токен.
+     */
+    private String authenticateAndGetToken(String username, String password) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password));
+
+        return tokenProvider.generateToken(authentication);
     }
 }

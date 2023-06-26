@@ -1,5 +1,6 @@
 package ru.arkham.webchat.configuration;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -14,14 +15,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ru.arkham.webchat.configuration.component.TokenAuthenticationFilter;
 import ru.arkham.webchat.controller.SecurityController;
 
 /**
  * Конфигуратор бинов для модуля безопасности.
  */
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurer {
+
+    /**
+     * Фильтр авторизации с помощью JWT токенов.
+     */
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     /**
      * Менеджер авторизации.
@@ -46,7 +55,7 @@ public class SecurityConfigurer {
                 .requestMatchers("/", "/error").permitAll()
                 .requestMatchers(SecurityController.URL_HOME + "/**").permitAll()
                 .anyRequest().authenticated());
-        // TODO: Добавить фильтр авторизации через токены.
+        http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.exceptionHandling(configurer -> configurer
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
         http.sessionManagement(configurer -> configurer
