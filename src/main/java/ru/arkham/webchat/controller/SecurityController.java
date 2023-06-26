@@ -10,6 +10,8 @@ import ru.arkham.webchat.controller.request.RegisterRequest;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.service.UserService;
 
+import java.util.NoSuchElementException;
+
 /**
  * Контроллер модуля безопасности.
  * TODO: Переделать все тела ответов в константы или использовать отдельные классы.
@@ -70,16 +72,18 @@ public class SecurityController {
     public ResponseEntity<String> processRegistration(@Valid @RequestBody RegisterRequest registerRequest) {
         String name = registerRequest.getName();
 
-        if (userService.findUserByName(name) != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("POST_REGISTER_USER_EXISTS");
+        try {
+            userService.findUserByName(name);
+        } catch (NoSuchElementException exception) {
+            // TODO: Изменить тело запроса для списка ролей.
+            User user = UserMapper.toUser(registerRequest);
+            user = userService.prepareNewUser(user);
+
+            userService.saveUser(user);
+
+            return ResponseEntity.ok("POST_REGISTER_OK");
         }
 
-        // TODO: Изменить тело запроса для списка ролей.
-        User user = UserMapper.toUser(registerRequest);
-        user = userService.prepareNewUser(user);
-
-        userService.saveUser(user);
-
-        return ResponseEntity.ok("POST_REGISTER_OK");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("POST_REGISTER_USER_EXISTS");
     }
 }
