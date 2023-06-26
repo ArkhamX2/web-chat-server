@@ -19,17 +19,26 @@ import java.util.UUID;
 @Component
 public class TokenProvider {
 
-    public static final String TOKEN_TYPE = "JWT";
-    public static final String TOKEN_ISSUER = "server";
-    public static final String TOKEN_AUDIENCE = "client";
+    /**
+     * Подписывающий ключ.
+     * Используется алгоритм HS512.
+     * Сгенерировано при помощи OpenSSL.
+     */
+    private static final String TOKEN_SECRET = "e2f007e4b5ef2f7bd580b78e5e8ed6a4bb7316966c4759fc71a7cb9d0f6bb9c258b57702fcaf6fab79ebbe72c6b7a6c5d1a52da61089d9f70629189dcd849366";
 
-    private static final String TOKEN_SECRET = "707";
+    /**
+     * Жизненный цикл токена JWS в минутах.
+     */
     private static final Long TOKEN_EXPIRATION_MINUTES = (long) (60 * 12);
+
+    private static final String TOKEN_TYPE = "JWT";
+    private static final String TOKEN_ISSUER = "server";
+    private static final String TOKEN_AUDIENCE = "client";
 
     /**
      * Сгенерировать токен.
      * @param authentication токен авторизации.
-     * @return токен.
+     * @return JWT токен.
      */
     public String generateToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -55,14 +64,16 @@ public class TokenProvider {
     }
 
     /**
-     * Спарсить и получить JWT токен.
+     * Спарсить токен и получить JWT токен при успехе.
      * @param token токен.
      * @return JWT токен.
      */
-    public Optional<Jws<Claims>> getJws(String token) {
+    public Optional<Jws<Claims>> parseToken(String token) {
         try {
+            // Подписывающий ключ.
             byte[] signingKey = TOKEN_SECRET.getBytes();
 
+            // Парсинг JWT.
             Jws<Claims> jws = Jwts.parserBuilder()
                     .setSigningKey(signingKey)
                     .build()
