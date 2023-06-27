@@ -32,7 +32,7 @@ public class TokenProvider {
     /**
      * Жизненный цикл токена JWS в минутах.
      */
-    private static final Long TOKEN_EXPIRATION_MINUTES = (long) (60 * 12);
+    private static final Long TOKEN_EXPIRATION_MINUTES = (long) (2);
 
     private static final String TOKEN_TYPE = "JWT";
     private static final String TOKEN_ISSUER = "server";
