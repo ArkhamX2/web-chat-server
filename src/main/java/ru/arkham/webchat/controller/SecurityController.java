@@ -12,6 +12,7 @@ import ru.arkham.webchat.controller.mapper.UserMapper;
 import ru.arkham.webchat.controller.request.LoginRequest;
 import ru.arkham.webchat.controller.request.RegisterRequest;
 import ru.arkham.webchat.controller.response.AuthResponse;
+import ru.arkham.webchat.exception.DuplicatedUserinfoException;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.service.UserService;
 
@@ -59,15 +60,15 @@ public class SecurityController {
      * TODO: Обработать исключения.
      * @param registerRequest тело запроса регистрации.
      * @return тело ответа авторизации.
+     * @throws DuplicatedUserinfoException если пользователь с указанными данными уже зарегистрирован.
      */
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(URL_REGISTER)
-    public AuthResponse processRegistration(@Valid @RequestBody RegisterRequest registerRequest) {
+    public AuthResponse processRegistration(@Valid @RequestBody RegisterRequest registerRequest) throws DuplicatedUserinfoException {
         String name = registerRequest.getName();
 
         if (userService.hasUserByName(name)) {
-            // TODO: Заменить исключением.
-            return new AuthResponse("test");
+            throw new DuplicatedUserinfoException("error");
         }
 
         // TODO: Изменить тело запроса для списка ролей.

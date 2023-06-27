@@ -27,6 +27,8 @@ import ru.arkham.webchat.controller.SecurityController;
 @EnableWebSecurity
 public class SecurityConfigurer {
 
+    private static final String URL_ANY = "/**";
+
     /**
      * Фильтр авторизации с помощью JWT токенов.
      */
@@ -53,7 +55,7 @@ public class SecurityConfigurer {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(registry -> registry
                 .requestMatchers("/", "/error").permitAll()
-                .requestMatchers(SecurityController.URL_HOME + "/**").permitAll()
+                .requestMatchers(SecurityController.URL_HOME + URL_ANY).permitAll()
                 .anyRequest().authenticated());
         http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.exceptionHandling(configurer -> configurer
