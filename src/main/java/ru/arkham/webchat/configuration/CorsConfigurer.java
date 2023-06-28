@@ -1,5 +1,6 @@
 package ru.arkham.webchat.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -14,6 +15,9 @@ import java.util.List;
 @Configuration
 public class CorsConfigurer {
 
+    @Value("${app.cors.allowed-origin}")
+    private String allowedOrigin;
+
     /**
      * Конфигурация CORS.
      * @return конфигурация CORS.
@@ -21,10 +25,9 @@ public class CorsConfigurer {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        List<String> allowedOrigins = List.of("http://localhost", "http://localhost:3000");
 
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedOrigins(List.of(allowedOrigin));
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
 
