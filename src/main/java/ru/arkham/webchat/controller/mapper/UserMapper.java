@@ -18,44 +18,44 @@ public class UserMapper {
 
     /**
      * Получить пользователя из тела данных.
-     * @param userData тело данных пользователя.
+     * @param data тело данных пользователя.
      * @return пользователь.
      */
-    public static User toUser(@NotNull UserData userData) {
+    public static User toUser(@NotNull UserData data) {
         User user = new User();
 
-        user.setName(userData.getName());
+        user.setName(data.getName());
 
         return user;
     }
 
     /**
      * Получить пользователя из тела запроса.
-     * @param loginRequest тело запроса авторизации.
+     * @param request тело запроса авторизации.
      * @return пользователь.
      */
-    public static User toUser(@NotNull LoginRequest loginRequest) {
+    public static User toUser(@NotNull LoginRequest request) {
         User user = new User();
 
-        user.setName(loginRequest.getName());
-        user.setPassword(loginRequest.getPassword());
+        user.setName(request.getName());
+        user.setPassword(request.getPassword());
 
         return user;
     }
 
     /**
      * Получить пользователя из тела запроса.
-     * @param registerRequest тело запроса регистрации.
+     * @param request тело запроса регистрации.
      * @return пользователь.
      */
-    public static User toUser(@NotNull RegisterRequest registerRequest) {
+    public static User toUser(@NotNull RegisterRequest request) {
         Role role = new Role();
         User user = new User();
 
-        role.setName(registerRequest.getRoleName());
+        role.setName(request.getRoleName());
 
-        user.setName(registerRequest.getName());
-        user.setPassword(registerRequest.getPassword());
+        user.setName(request.getName());
+        user.setPassword(request.getPassword());
         user.setRoles(List.of(role));
 
         return user;

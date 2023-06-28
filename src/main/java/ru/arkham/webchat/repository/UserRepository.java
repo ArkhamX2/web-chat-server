@@ -16,11 +16,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return Пользователь.
      */
     Optional<User> findByName(String name);
-
-    /**
-     * Проверить наличие пользователя по его имени.
-     * @param name имя.
-     * @return Статус проверки.
-     */
-    Boolean existsByName(String name);
 }

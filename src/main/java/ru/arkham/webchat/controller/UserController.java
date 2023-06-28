@@ -50,12 +50,12 @@ public class UserController {
 
     /**
      * GET запрос получения текущего пользователя.
-     * @param userDetails данные пользователя.
+     * @param details данные пользователя.
      * @return пользователь.
      */
     @GetMapping(URL_CURRENT)
-    public UserData getCurrent(@AuthenticationPrincipal UserDetails userDetails) {
-        String name = userDetails.getUsername();
+    public UserData getCurrent(@AuthenticationPrincipal UserDetails details) {
+        String name = details.getUsername();
         User user = userService
                 .findUserByName(name)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));

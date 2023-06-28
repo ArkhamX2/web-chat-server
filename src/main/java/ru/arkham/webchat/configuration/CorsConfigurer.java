@@ -15,6 +15,9 @@ import java.util.List;
 @Configuration
 public class CorsConfigurer {
 
+    /**
+     * Разрешенный источник.
+     */
     @Value("${app.cors.allowed-origin}")
     private String allowedOrigin;
 

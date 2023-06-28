@@ -50,12 +50,12 @@ public class SecurityController {
 
     /**
      * POST запрос авторизации пользователя.
-     * @param loginRequest тело запроса авторизации.
+     * @param request тело запроса авторизации.
      * @return тело ответа авторизации.
      */
     @PostMapping(URL_LOGIN)
-    public ResponseEntity<UserData> processLogin(@Valid @RequestBody LoginRequest loginRequest) {
-        User user = UserMapper.toUser(loginRequest);
+    public ResponseEntity<UserData> processLogin(@Valid @RequestBody LoginRequest request) {
+        User user = UserMapper.toUser(request);
         String token = authenticateAndGetToken(user.getName(), user.getPassword());
         HttpHeaders httpHeaders = new HttpHeaders();
 
@@ -69,24 +69,24 @@ public class SecurityController {
 
     /**
      * POST запрос регистрации пользователя.
-     * @param registerRequest тело запроса регистрации.
+     * @param request тело запроса регистрации.
      * @return тело ответа авторизации.
      * @throws DuplicatedUserinfoException если пользователь с указанными данными уже зарегистрирован.
      */
     @PostMapping(URL_REGISTER)
-    public ResponseEntity<UserData> processRegistration(@Valid @RequestBody RegisterRequest registerRequest) throws DuplicatedUserinfoException {
-        String name = registerRequest.getName();
+    public ResponseEntity<UserData> processRegistration(@Valid @RequestBody RegisterRequest request) throws DuplicatedUserinfoException {
+        String name = request.getName();
 
         if (userService.hasUserByName(name)) {
             throw new DuplicatedUserinfoException("Пользователь уже зарегистрирован!");
         }
 
         // TODO: Изменить тело запроса для списка ролей.
-        User user = UserMapper.toUser(registerRequest);
+        User user = UserMapper.toUser(request);
         user = userService.prepareNewUser(user);
         user = userService.saveUser(user);
 
-        String token = authenticateAndGetToken(registerRequest.getName(), registerRequest.getPassword());
+        String token = authenticateAndGetToken(request.getName(), request.getPassword());
         HttpHeaders httpHeaders = new HttpHeaders();
 
         tokenProvider.addTokenToHttpHeaders(token, httpHeaders);

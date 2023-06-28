@@ -24,10 +24,13 @@ public class ErrorAttributesConfigurer {
     public ErrorAttributes errorAttributes() {
         return new DefaultErrorAttributes() {
             @Override
-            public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions options) {
+            public Map<String, Object> getErrorAttributes(WebRequest request, ErrorAttributeOptions options) {
                 // Включаем информацию об исключении,
                 // сообщение об ошибке и ошибки привязки данных.
-                return super.getErrorAttributes(webRequest, options.including(ErrorAttributeOptions.Include.EXCEPTION, ErrorAttributeOptions.Include.MESSAGE, ErrorAttributeOptions.Include.BINDING_ERRORS));
+                return super.getErrorAttributes(request, options.including(
+                        ErrorAttributeOptions.Include.EXCEPTION,
+                        ErrorAttributeOptions.Include.MESSAGE,
+                        ErrorAttributeOptions.Include.BINDING_ERRORS));
             }
         };
     }

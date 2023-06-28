@@ -16,11 +16,4 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
      * @return Пользовательская роль.
      */
     Optional<Role> findByName(String name);
-
-    /**
-     * Проверить наличие пользовательской роли по ее названию.
-     * @param name название.
-     * @return Статус проверки.
-     */
-    Boolean existsByName(String name);
 }

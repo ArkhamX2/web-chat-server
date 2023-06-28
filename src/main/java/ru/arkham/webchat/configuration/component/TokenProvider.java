@@ -130,16 +130,16 @@ public class TokenProvider {
     /**
      * Вставить токен в набор HTTP заголовков.
      * @param token токен.
-     * @param httpHeaders HTTP заголовки.
+     * @param headers HTTP заголовки.
      */
-    public void addTokenToHttpHeaders(@NotNull String token, @NotNull HttpHeaders httpHeaders) {
+    public void addTokenToHttpHeaders(@NotNull String token, @NotNull HttpHeaders headers) {
         // Вставляем вместе с префиксом.
         token = TOKEN_PREFIX + token;
 
-        if (httpHeaders.containsKey(TOKEN_HEADER)) {
-            httpHeaders.set(TOKEN_HEADER, token);
+        if (headers.containsKey(TOKEN_HEADER)) {
+            headers.set(TOKEN_HEADER, token);
         } else {
-            httpHeaders.add(TOKEN_HEADER, token);
+            headers.add(TOKEN_HEADER, token);
         }
     }
 }
