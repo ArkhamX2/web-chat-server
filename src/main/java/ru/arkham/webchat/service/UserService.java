@@ -66,6 +66,14 @@ public class UserService {
     }
 
     /**
+     * Получить всех пользователей.
+     * @return список пользователей.
+     */
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    /**
      * Получить пользователя по имени.
      * @param name имя.
      * @return пользователь.

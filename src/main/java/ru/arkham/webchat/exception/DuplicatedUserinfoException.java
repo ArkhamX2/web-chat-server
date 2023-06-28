@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.CONFLICT)
 public class DuplicatedUserinfoException extends RuntimeException {
 
+    /**
+     * Конструктор.
+     * @param message сообщение.
+     */
     public DuplicatedUserinfoException(String message) {
         super(message);
     }

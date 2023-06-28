@@ -78,7 +78,7 @@ public class SecurityController {
         String name = registerRequest.getName();
 
         if (userService.hasUserByName(name)) {
-            throw new DuplicatedUserinfoException("error");
+            throw new DuplicatedUserinfoException("Пользователь уже зарегистрирован!");
         }
 
         // TODO: Изменить тело запроса для списка ролей.
