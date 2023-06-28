@@ -24,6 +24,8 @@ import java.util.List;
 public class UserController {
 
     public static final String URL_HOME = "/user";
+    public static final String URL_ALL = "/all";
+    public static final String URL_CURRENT = "/me";
 
     /**
      * Сервис работы с пользователями.
@@ -34,7 +36,7 @@ public class UserController {
      * GET запрос получения всех пользователей.
      * @return список пользователей.
      */
-    @GetMapping
+    @GetMapping(URL_ALL)
     public List<UserData> getAll() {
         List<User> userList = userService.findAll();
         List<UserData> userDataList = new ArrayList<>();
@@ -51,7 +53,7 @@ public class UserController {
      * @param userDetails данные пользователя.
      * @return пользователь.
      */
-    @GetMapping("/me")
+    @GetMapping(URL_CURRENT)
     public UserData getCurrent(@AuthenticationPrincipal UserDetails userDetails) {
         String name = userDetails.getUsername();
         User user = userService

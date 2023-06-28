@@ -33,6 +33,7 @@ public class CorsConfigurer {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
+        // TODO: Разместить все пути в одном месте.
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
