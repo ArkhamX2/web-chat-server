@@ -1,5 +1,7 @@
 package ru.arkham.webchat.configuration.component;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,14 +15,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
 
 /**
- * Фильтр авторизации с помощью JWT токенов.
+ * Фильтр авторизации с помощью токенов.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -28,22 +29,12 @@ import java.util.Optional;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     /**
-     * Заголовок JWT токена.
-     */
-    private static final String TOKEN_HEADER = "Authorization";
-
-    /**
-     * Префикс JWT токена.
-     */
-    private static final String TOKEN_PREFIX = "Bearer ";
-
-    /**
      * Сервис работы с данными пользователей модуля безопасности.
      */
     private final UserDetailsService userDetailsService;
 
     /**
-     * Провайдер JWT токенов.
+     * Провайдер токенов.
      */
     private final TokenProvider tokenProvider;
 
@@ -52,37 +43,27 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             @NotNull HttpServletRequest request,
             @NotNull HttpServletResponse response,
             @NotNull FilterChain chain) throws ServletException, IOException {
-        try {
-            getJwtFromRequest(request)
-                    .flatMap(tokenProvider::parseToken)
-                    .ifPresent(jws -> {
-                        String username = jws.getBody().getSubject();
-                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
+        Optional<String> token = tokenProvider.getTokenFromRequest(request);
+        Optional<Jws<Claims>> claimsJws = token.flatMap(tokenProvider::tryParseToken);
 
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    });
+        if (claimsJws.isEmpty()) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            String username = claimsJws.get().getBody().getSubject();
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            tokenProvider.addTokenToResponse(token.get(), response);
         } catch (Exception exception) {
             log.error("Ошибка авторизации пользователя!", exception);
         }
 
         chain.doFilter(request, response);
-    }
-
-    /**
-     * Получить JWT строку с токеном из запроса.
-     * @param request запрос.
-     * @return JWT строка с токеном.
-     */
-    private Optional<String> getJwtFromRequest(@NotNull HttpServletRequest request) {
-        String tokenHeader = request.getHeader(TOKEN_HEADER);
-
-        if (StringUtils.hasText(tokenHeader) && tokenHeader.startsWith(TOKEN_PREFIX)) {
-            return Optional.of(tokenHeader.replace(TOKEN_PREFIX, ""));
-        }
-
-        return Optional.empty();
     }
 }

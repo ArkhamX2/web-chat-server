@@ -16,7 +16,6 @@ import static ru.arkham.webchat.model.Role.NAME_DEFAULT;
 
 /**
  * Сервис работы с пользователями.
- * TODO: Возвращать Optional<User> везде где это необходимо.
  */
 @RequiredArgsConstructor
 @Service

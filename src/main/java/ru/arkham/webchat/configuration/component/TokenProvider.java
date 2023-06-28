@@ -3,82 +3,79 @@ package ru.arkham.webchat.configuration.component;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Провайдер JWT токенов.
+ * Провайдер токенов.
  */
 @Slf4j
 @Component
 public class TokenProvider {
 
     /**
+     * Заголовок токена в заголовке HTTP запроса.
+     */
+    private static final String TOKEN_HEADER = "Authorization";
+
+    /**
+     * Префикс токена в заголовке HTTP запроса.
+     */
+    private static final String TOKEN_PREFIX = "Bearer ";
+
+    /**
      * Подписывающий ключ.
      * Используется алгоритм HS512.
-     * Сгенерировано при помощи OpenSSL.
      */
-    private static final String TOKEN_SECRET = "e2f007e4b5ef2f7bd580b78e5e8ed6a4bb7316966c4759fc71a7cb9d0f6bb9c258b57702fcaf6fab79ebbe72c6b7a6c5d1a52da61089d9f70629189dcd849366";
+    @Value("${app.jwt.secret-key}")
+    private String secretKey;
 
     /**
-     * Жизненный цикл токена JWS в минутах.
+     * Жизненный цикл токена в секундах.
      */
-    private static final Long TOKEN_EXPIRATION_MINUTES = (long) (2);
-
-    private static final String TOKEN_TYPE = "JWT";
-    private static final String TOKEN_ISSUER = "server";
-    private static final String TOKEN_AUDIENCE = "client";
+    @Value("${app.jwt.token-lifetime-seconds}")
+    private Long tokenLifetimeSeconds;
 
     /**
-     * Сгенерировать токен.
-     * @param authentication токен авторизации.
-     * @return JWT токен.
+     * Сгенерировать новый токен.
+     * @param authentication аутентифицированное состояние пользователя.
+     * @return новый токен.
      */
     public String generateToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
-        byte[] signingKey = TOKEN_SECRET.getBytes();
 
         return Jwts.builder()
-                .setHeaderParam("typ", TOKEN_TYPE)
-                .signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
-                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(TOKEN_EXPIRATION_MINUTES).toInstant()))
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS512)
+                .setExpiration(Date.from(ZonedDateTime.now().plusSeconds(tokenLifetimeSeconds).toInstant()))
                 .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
                 .setId(UUID.randomUUID().toString())
-                .setIssuer(TOKEN_ISSUER)
-                .setAudience(TOKEN_AUDIENCE)
                 .setSubject(userDetails.getUsername())
-                .claim("rol", roles)
-                .claim("name", userDetails.getUsername())
                 .compact();
     }
 
     /**
-     * Спарсить токен и получить JWT токен при успехе.
+     * Попытаться разобрать токен на части.
      * @param token токен.
-     * @return JWT токен.
+     * @return разобранный на части токен или ничего.
      */
-    public Optional<Jws<Claims>> parseToken(String token) {
+    public Optional<Jws<Claims>> tryParseToken(String token) {
         try {
-            // Подписывающий ключ.
-            byte[] signingKey = TOKEN_SECRET.getBytes();
-
-            // Парсинг JWT.
+            // Парсинг токена.
             Jws<Claims> jws = Jwts.parserBuilder()
-                    .setSigningKey(signingKey)
+                    .setSigningKey(secretKey.getBytes())
                     .build()
                     .parseClaimsJws(token);
 
@@ -96,5 +93,53 @@ public class TokenProvider {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Получить токен из заголовка запроса.
+     * @param request HTTP запрос.
+     * @return токен.
+     */
+    public Optional<String> getTokenFromRequest(@NotNull HttpServletRequest request) {
+        String token = request.getHeader(TOKEN_HEADER);
+
+        if (StringUtils.hasText(token) && token.startsWith(TOKEN_PREFIX)) {
+            // Возвращаем без префикса.
+            return Optional.of(token.replace(TOKEN_PREFIX, ""));
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Вставить токен в заголовок ответа.
+     * @param token токен.
+     * @param response HTTP ответ.
+     */
+    public void addTokenToResponse(@NotNull String token, @NotNull HttpServletResponse response) {
+        // Вставляем вместе с префиксом.
+        token = TOKEN_PREFIX + token;
+
+        if (response.getHeaderNames().contains(TOKEN_HEADER)) {
+            response.setHeader(TOKEN_HEADER, token);
+        } else {
+            response.addHeader(TOKEN_HEADER, token);
+        }
+    }
+
+    /**
+     * Вставить токен в набор HTTP заголовков.
+     * @param token токен.
+     * @param httpHeaders HTTP заголовки.
+     */
+    public void addTokenToHttpHeaders(@NotNull String token, @NotNull HttpHeaders httpHeaders) {
+        // Вставляем вместе с префиксом.
+        token = TOKEN_PREFIX + token;
+
+        if (httpHeaders.containsKey(TOKEN_HEADER)) {
+            httpHeaders.set(TOKEN_HEADER, token);
+        } else {
+            httpHeaders.add(TOKEN_HEADER, token);
+        }
     }
 }

@@ -2,16 +2,21 @@ package ru.arkham.webchat.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.arkham.webchat.configuration.component.TokenProvider;
 import ru.arkham.webchat.controller.mapper.UserMapper;
 import ru.arkham.webchat.controller.request.LoginRequest;
 import ru.arkham.webchat.controller.request.RegisterRequest;
-import ru.arkham.webchat.controller.response.AuthResponse;
+import ru.arkham.webchat.controller.response.UserData;
 import ru.arkham.webchat.exception.DuplicatedUserinfoException;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.service.UserService;
@@ -49,22 +54,27 @@ public class SecurityController {
      * @return тело ответа авторизации.
      */
     @PostMapping(URL_LOGIN)
-    public AuthResponse processLogin(@Valid @RequestBody LoginRequest loginRequest) {
-        String token = authenticateAndGetToken(loginRequest.getName(), loginRequest.getPassword());
+    public ResponseEntity<UserData> processLogin(@Valid @RequestBody LoginRequest loginRequest) {
+        User user = UserMapper.toUser(loginRequest);
+        String token = authenticateAndGetToken(user.getName(), user.getPassword());
+        HttpHeaders httpHeaders = new HttpHeaders();
 
-        return new AuthResponse(token);
+        tokenProvider.addTokenToHttpHeaders(token, httpHeaders);
+
+        return ResponseEntity
+                .ok()
+                .headers(httpHeaders)
+                .body(UserMapper.toUserData(user));
     }
 
     /**
      * POST запрос регистрации пользователя.
-     * TODO: Обработать исключения.
      * @param registerRequest тело запроса регистрации.
      * @return тело ответа авторизации.
      * @throws DuplicatedUserinfoException если пользователь с указанными данными уже зарегистрирован.
      */
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(URL_REGISTER)
-    public AuthResponse processRegistration(@Valid @RequestBody RegisterRequest registerRequest) throws DuplicatedUserinfoException {
+    public ResponseEntity<UserData> processRegistration(@Valid @RequestBody RegisterRequest registerRequest) throws DuplicatedUserinfoException {
         String name = registerRequest.getName();
 
         if (userService.hasUserByName(name)) {
@@ -74,20 +84,24 @@ public class SecurityController {
         // TODO: Изменить тело запроса для списка ролей.
         User user = UserMapper.toUser(registerRequest);
         user = userService.prepareNewUser(user);
-
-        userService.saveUser(user);
+        user = userService.saveUser(user);
 
         String token = authenticateAndGetToken(registerRequest.getName(), registerRequest.getPassword());
+        HttpHeaders httpHeaders = new HttpHeaders();
 
-        return new AuthResponse(token);
+        tokenProvider.addTokenToHttpHeaders(token, httpHeaders);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .headers(httpHeaders)
+                .body(UserMapper.toUserData(user));
     }
 
     /**
-     * Авторизовать пользователя через его уникальное имя и пароль
-     * и получить JWT токен.
-     * @param username уникальное имя.
+     * Авторизовать пользователя по его данным и получить токен.
+     * @param username имя.
      * @param password пароль.
-     * @return JWT токен.
+     * @return токен.
      */
     private String authenticateAndGetToken(String username, String password) {
         Authentication authentication = authenticationManager.authenticate(
