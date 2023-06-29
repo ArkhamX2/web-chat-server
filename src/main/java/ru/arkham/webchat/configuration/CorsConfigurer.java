@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import ru.arkham.webchat.configuration.component.TokenProvider;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class CorsConfigurer {
         configuration.setAllowedOrigins(List.of(allowedOrigin));
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
+        configuration.setExposedHeaders(List.of(TokenProvider.TOKEN_HEADER));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 

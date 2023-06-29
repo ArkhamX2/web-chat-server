@@ -29,7 +29,7 @@ public class TokenProvider {
     /**
      * Заголовок токена в заголовке HTTP запроса.
      */
-    private static final String TOKEN_HEADER = "Authorization";
+    public static final String TOKEN_HEADER = "Authorization";
 
     /**
      * Префикс токена в заголовке HTTP запроса.
