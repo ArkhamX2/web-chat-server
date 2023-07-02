@@ -10,5 +10,6 @@ public class Chat {
     @Id
     private String id;
     private String chatName;
-    private List<User> Users;
+    private List<User> users;
+
 }
