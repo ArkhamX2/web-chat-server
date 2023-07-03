@@ -17,6 +17,12 @@ spring:
 server:
   port: 8081
 
+app:
+  # Настройки CORS.
+  cors:
+    # Разрешенный источник.
+    allowed-origin: "http://localhost"
+
 # Вывод кучи логов при каждом запросе.
 # TODO: Не для продакшена.
 logging:
