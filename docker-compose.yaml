@@ -1,0 +1,19 @@
+# Конфигурация для запуска локального билда (в том числе в режиме дебага).
+# Сервер поднимается локально. Нужна только база данных.
+services:
+  database:
+    container_name: 'database'
+    image: 'mariadb:latest'
+    restart: 'always'
+    environment:
+      MARIADB_DATABASE: 'web-chat'
+      MARIADB_USER: 'arkham'
+      MARIADB_PASSWORD: 'secret'
+      MARIADB_ROOT_PASSWORD: 'verysecret'
+    ports:
+      - '3306:3306'
+    volumes:
+      - 'data:/var/lib/mysql'
+
+volumes:
+  data:

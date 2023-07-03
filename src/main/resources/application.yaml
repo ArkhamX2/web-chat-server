@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: 'web-chat-server'
+  datasource:
+    url: 'jdbc:mariadb://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DATABASE}'
+    username: '${DATASOURCE_USER}'
+    password: '${DATASOURCE_PASSWORD}'
+    driver-class-name: 'org.mariadb.jdbc.Driver'
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: 'update'
+    properties:
+      hibernate:
+        dialect: 'org.hibernate.dialect.MariaDBDialect'
+
+server:
+  port: 8081
+
+app:
+  # Настройки CORS.
+  cors:
+    # Разрешенный источник.
+    allowed-origin: "http://localhost"
+
+# Вывод кучи логов при каждом запросе.
+# TODO: Не для продакшена.
+logging:
+  level:
+    web: 'debug'
+    org.springframework.security: 'debug'
