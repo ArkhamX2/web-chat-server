@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Chat {
 
     /**
@@ -34,6 +35,6 @@ public class Chat {
     /**
      * Список сообщений.
      */
-    @OneToMany(mappedBy="chat")
+    @OneToMany(mappedBy = "chat")
     private List<Message> messages;
 }
