@@ -28,4 +28,3 @@ app:
 logging:
   level:
     web: 'debug'
-    org.springframework.security: 'debug'
