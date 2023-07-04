@@ -10,4 +10,5 @@ import java.util.Optional;
 
 public interface ChatRepo extends JpaRepository<Chat,String> {
         List<Chat> findByUser(User user);
+
 }

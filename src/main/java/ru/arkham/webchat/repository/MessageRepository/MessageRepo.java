@@ -7,5 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MessageRepo extends JpaRepository<Message,String> {
-        Optional<List<Message>> findByChatId();
+        List<Message> findByChatId(String chatId);
+
 }
