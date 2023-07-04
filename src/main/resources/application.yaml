@@ -27,4 +27,5 @@ app:
 # TODO: Не для продакшена.
 logging:
   level:
-    web: 'debug'
+    web: 'DEBUG'
+    org.springframework.messaging: 'DEBUG'
