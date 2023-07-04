@@ -74,20 +74,17 @@ public class MessageService {
     }
 
     /**
-     * Получить сообщение по идентификатору и отметить его как полученное.
+     * Попытаться получить сообщение по идентификатору и отметить его как полученное.
      * @param id идентификатор.
-     * @return сообщение.
-     * @throws Exception если сообщение не найдено.
+     * @return сообщение или ничего.
      */
-    public Message find(Long id) throws Exception {
-        return messageRepository
-                .findById(id)
-                .map(message -> {
-                    message.setStatus(MessageStatus.DELIVERED);
+    public Optional<Message> find(Long id) {
+        return messageRepository.findById(id)
+                .map(sample -> {
+                    sample.setStatus(MessageStatus.DELIVERED);
 
-                    return messageRepository.save(message);
-                })
-                .orElseThrow(() -> new Exception("Сообщение не найдено!"));
+                    return messageRepository.save(sample);
+                });
     }
 
     /**

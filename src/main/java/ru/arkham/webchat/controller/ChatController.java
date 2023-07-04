@@ -9,12 +9,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.arkham.webchat.controller.exception.ChatNotFoundException;
+import ru.arkham.webchat.controller.exception.MessageNotFoundException;
 import ru.arkham.webchat.controller.payload.request.MessageRequest;
 import ru.arkham.webchat.model.Chat;
 import ru.arkham.webchat.model.ChatNotification;
 import ru.arkham.webchat.model.Message;
 import ru.arkham.webchat.service.ChatService;
 import ru.arkham.webchat.service.MessageService;
+
+import java.util.Optional;
 
 /**
  * Контроллер чатов.
@@ -98,10 +101,16 @@ public class ChatController {
      * GET запрос поиска сообщения по его идентификатору.
      * @param id идентификатор.
      * @return сообщение.
-     * @throws Exception при отсутствии сообщения.
+     * @throws MessageNotFoundException при отсутствии сообщения.
      */
     @GetMapping("/messages/{id}")
-    public ResponseEntity<?> findMessage(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(messageService.find(id));
+    public ResponseEntity<?> findMessage(@PathVariable Long id) throws MessageNotFoundException {
+        Optional<Message> message = messageService.find(id);
+
+        if (message.isEmpty()) {
+            throw new MessageNotFoundException("Сообщение не найдено!");
+        }
+
+        return ResponseEntity.ok(message);
     }
 }
