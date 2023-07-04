@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import ru.arkham.webchat.controller.exception.ChatNotFoundException;
 import ru.arkham.webchat.controller.payload.request.MessageRequest;
 import ru.arkham.webchat.model.Chat;
 import ru.arkham.webchat.model.ChatNotification;
@@ -41,13 +42,13 @@ public class ChatController {
     /**
      * Обработать новое сообщение.
      * @param request тело запроса сообщения.
-     * @throws Exception при невозможности создания чата.
+     * @throws ChatNotFoundException при невозможности создания чата.
      */
     @MessageMapping("/chat")
-    public void processMessage(@Payload MessageRequest request) throws Exception {
+    public void processMessage(@Payload MessageRequest request) throws ChatNotFoundException {
         Chat chat = chatService
                 .getChat(request.getSenderId(), request.getRecipientId(), true)
-                .orElseThrow(() -> new Exception("ERR"));
+                .orElseThrow(() -> new ChatNotFoundException("Внутренняя ошибка создания чата!"));
 
         Message message = new Message();
 
@@ -59,10 +60,9 @@ public class ChatController {
         message = messageService.saveAndUpdateStatus(message);
 
         messagingTemplate.convertAndSendToUser(
-                request.getRecipientId().toString(), "/queue/messages",
-                new ChatNotification(
-                        message.getId(),
-                        message.getSenderId()));
+                request.getRecipientId().toString(),
+                "/queue/messages",
+                new ChatNotification(message.getId(), message.getSenderId()));
     }
 
     /**
@@ -70,13 +70,13 @@ public class ChatController {
      * @param firstId идентификатор первого участника (отправителя).
      * @param secondId идентификатор второго участника.
      * @return количество новых сообщений.
-     * @throws Exception при отсутствии чата между двумя участниками.
+     * @throws ChatNotFoundException при отсутствии чата между двумя участниками.
      */
     @GetMapping("/messages/{firstId}/{secondId}/count")
-    public ResponseEntity<Long> countNewMessages(@PathVariable Long firstId, @PathVariable Long secondId) throws Exception {
+    public ResponseEntity<Long> countNewMessages(@PathVariable Long firstId, @PathVariable Long secondId) throws ChatNotFoundException {
         Chat chat = chatService
                 .getChat(firstId, secondId, true)
-                .orElseThrow(() -> new Exception("ERR"));
+                .orElseThrow(() -> new ChatNotFoundException("Чат между указанными участниками не найден!"));
 
         return ResponseEntity
                 .ok(messageService.countReceived(firstId, chat.getId()));
