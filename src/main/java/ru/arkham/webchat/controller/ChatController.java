@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.arkham.webchat.controller.exception.ChatNotFoundException;
 import ru.arkham.webchat.controller.exception.MessageNotFoundException;
+import ru.arkham.webchat.controller.payload.MessageMapper;
 import ru.arkham.webchat.controller.payload.request.MessageRequest;
 import ru.arkham.webchat.model.Chat;
 import ru.arkham.webchat.model.ChatNotification;
@@ -53,12 +54,9 @@ public class ChatController {
                 .getChat(request.getSenderId(), request.getRecipientId(), true)
                 .orElseThrow(() -> new ChatNotFoundException("Внутренняя ошибка создания чата!"));
 
-        Message message = new Message();
+        Message message = MessageMapper.toMessage(request);
 
-        // TODO: Нужен мэппер.
-        message.setSenderId(request.getSenderId());
         message.setChat(chat);
-        message.setContent(request.getContent());
 
         message = messageService.saveAndUpdateStatus(message);
 
