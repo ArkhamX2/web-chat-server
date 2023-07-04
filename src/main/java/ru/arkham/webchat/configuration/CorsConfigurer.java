@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
@@ -28,20 +28,25 @@ public class CorsConfigurer {
      * @return конфигурация CORS.
      */
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+    public CorsFilter corsFilter() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        final CorsConfiguration configuration = new CorsConfiguration();
 
         // TODO: Протестировать.
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of(allowedOrigin));
-        configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        configuration.addAllowedMethod("OPTIONS");
+        configuration.addAllowedMethod("HEAD");
+        configuration.addAllowedMethod("GET");
+        configuration.addAllowedMethod("PUT");
+        configuration.addAllowedMethod("POST");
+        configuration.addAllowedMethod("DELETE");
+        configuration.addAllowedMethod("PATCH");
 
         // TODO: Разместить все пути в одном месте.
         source.registerCorsConfiguration("/**", configuration);
 
-        return source;
+        return new CorsFilter(source);
     }
 }
