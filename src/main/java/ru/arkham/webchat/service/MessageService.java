@@ -29,11 +29,11 @@ public class MessageService {
     private final ChatService chatService;
 
     /**
-     * Сохранить новое сообщение.
+     * Сохранить полученное сообщение.
      * @param message сообщение.
      * @return сохраненное сообщение.
      */
-    public Message save(Message message) {
+    public Message saveAndUpdateStatus(Message message) {
         message.setStatus(MessageStatus.RECEIVED);
         messageRepository.save(message);
 
@@ -41,25 +41,24 @@ public class MessageService {
     }
 
     /**
-     * Подсчитать количество новых сообщений.
+     * Подсчитать количество полученных сообщений.
      * @param senderId идентификатор отправителя.
      * @param chatId идентификатор чата.
      * @return количество сообщений.
      */
-    public Long countNewMessages(Long senderId, Long chatId) {
+    public Long countReceived(Long senderId, Long chatId) {
         return messageRepository.countBySenderIdAndChatIdAndStatus(
                 senderId, chatId, MessageStatus.RECEIVED);
     }
 
     /**
-     * Получить список сообщений от определенного отправителя.
-     * TODO: исправить.
-     * @param senderId идентификатор отправителя.
-     * @param recipientId идентификатор получателя.
+     * Получить список сообщений между первым и вторым участниками.
+     * @param firstId идентификатор первого участника.
+     * @param secondId идентификатор второго участника.
      * @return список сообщений или пустой список.
      */
-    public List<Message> findChatMessages(Long senderId, Long recipientId) {
-        Optional<Chat> chat = chatService.getChat(senderId, recipientId, false);
+    public List<Message> findAll(Long firstId, Long secondId) {
+        Optional<Chat> chat = chatService.getChat(firstId, secondId, false);
 
         if (chat.isEmpty()) {
             return new ArrayList<>();
@@ -68,19 +67,19 @@ public class MessageService {
         List<Message> messages = chat.get().getMessages();
 
         if(messages.size() > 0) {
-            updateStatuses(senderId, chat.get().getId(), MessageStatus.DELIVERED);
+            updateStatuses(firstId, chat.get().getId(), MessageStatus.DELIVERED);
         }
 
         return messages;
     }
 
     /**
-     * Получить сообщение по идентификатору.
+     * Получить сообщение по идентификатору и отметить его как полученное.
      * @param id идентификатор.
      * @return сообщение.
      * @throws Exception если сообщение не найдено.
      */
-    public Message findById(Long id) throws Exception {
+    public Message find(Long id) throws Exception {
         return messageRepository
                 .findById(id)
                 .map(message -> {
@@ -93,6 +92,7 @@ public class MessageService {
 
     /**
      * обновить статусы сообщений от определенного отправителя в определенном чате.
+     * TODO: проверить.
      * @param senderId идентификатор отправителя.
      * @param chatId идентификатор чата.
      * @param status статус отправления.

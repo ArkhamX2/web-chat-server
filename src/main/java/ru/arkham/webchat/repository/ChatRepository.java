@@ -12,9 +12,9 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     /**
      * Найти чат по идентификаторам отправителя или получателя.
-     * @param senderId идентификатор отправителя.
-     * @param recipientId идентификатор получателя.
+     * @param firstId идентификатор первого участника.
+     * @param secondId идентификатор второго участника.
      * @return чат или ничего.
      */
-    Optional<Chat> findBySenderIdOrSenderId(Long senderId, Long recipientId);
+    Optional<Chat> findByFirstEndpointIdOrSecondEndpointId(Long firstId, Long secondId);
 }

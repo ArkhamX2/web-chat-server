@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Чат между двумя участниками.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,16 +24,16 @@ public class Chat {
     private Long id;
 
     /**
-     * Идентификатор отправителя.
+     * Идентификатор первого участника.
      */
     @Column(nullable = false)
-    private Long senderId;
+    private Long firstEndpointId;
 
     /**
-     * Идентификатор получателя.
+     * Идентификатор второго участника.
      */
     @Column(nullable = false)
-    private Long recipientId;
+    private Long secondEndpointId;
 
     /**
      * Список сообщений.

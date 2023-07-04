@@ -21,13 +21,19 @@ public class ChatService {
 
     /**
      * Попытаться получить чат.
-     * @param senderId идентификатор отправителя.
-     * @param recipientId идентификатор получателя.
+     * @param firstId идентификатор первого участника.
+     * @param secondId идентификатор второго участника.
      * @param createIfNotExist создать при отсутствии.
      * @return чат или ничего.
      */
-    public Optional<Chat> getChat(Long senderId, Long recipientId, boolean createIfNotExist) {
-        Optional<Chat> chat = chatRepository.findBySenderIdOrSenderId(senderId, recipientId);
+    public Optional<Chat> getChat(Long firstId, Long secondId, boolean createIfNotExist) {
+        Optional<Chat> chat = chatRepository.findByFirstEndpointIdOrSecondEndpointId(firstId, secondId);
+
+        if (chat.isPresent()) {
+            return chat;
+        }
+
+        chat = chatRepository.findByFirstEndpointIdOrSecondEndpointId(secondId, firstId);
 
         if (chat.isPresent()) {
             return chat;
@@ -39,8 +45,8 @@ public class ChatService {
 
         Chat newChat = new Chat();
 
-        newChat.setSenderId(senderId);
-        newChat.setRecipientId(recipientId);
+        newChat.setFirstEndpointId(firstId);
+        newChat.setSecondEndpointId(secondId);
 
         return Optional.of(chatRepository.save(newChat));
     }
