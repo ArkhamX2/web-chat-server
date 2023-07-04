@@ -27,14 +27,4 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
      * @return количество сообщений.
      */
     Long countBySenderIdAndChatIdAndStatus(Long senderId, Long chatId, MessageStatus status);
-
-    /**
-     * Обновить статусы всех сообщений от определенного отправителя
-     * в определенном чате.
-     * TODO: Протестировать.
-     * @param senderId идентификатор отправителя.
-     * @param chatId идентификатор чата.
-     * @param status статус отправки.
-     */
-    void updateAllBySenderIdAndChatId(Long senderId, Long chatId, MessageStatus status);
 }

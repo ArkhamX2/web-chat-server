@@ -95,6 +95,6 @@ public class MessageService {
      * @param status статус отправления.
      */
     public void updateStatuses(Long senderId, Long chatId, MessageStatus status) {
-        messageRepository.updateAllBySenderIdAndChatId(senderId, chatId, status);
+        //messageRepository.updateAllBySenderIdAndChatId(senderId, chatId, status);
     }
 }
