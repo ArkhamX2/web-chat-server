@@ -95,6 +95,10 @@ public class MessageService {
      * @param status статус отправления.
      */
     public void updateStatuses(Long senderId, Long chatId, MessageStatus status) {
-        // TODO: UPDATE message SET status = '?' WHERE senderId = '?' AND chatId = '?';
+        List<Message> messages = messageRepository.findBySenderIdAndChatId(senderId,chatId);
+        for (Message message: messages) {
+            message.setStatus(status);
+        }
+        messageRepository.saveAll(messages);
     }
 }
