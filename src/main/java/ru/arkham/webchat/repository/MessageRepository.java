@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.arkham.webchat.model.Message;
 import ru.arkham.webchat.model.MessageStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -27,4 +28,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
      * @return количество сообщений.
      */
     Long countBySenderIdAndChatIdAndStatus(Long senderId, Long chatId, MessageStatus status);
+
+    List<Message> findBySenderIdAndChatId(Long senderId, Long chatId);
 }
